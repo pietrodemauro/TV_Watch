@@ -4,7 +4,7 @@ import psycopg2
 # 1. Database Connection (using localhost or local IP since it runs on the server)
 # Ensure password and username are correct
 conn = psycopg2.connect(
-    host="127.0.0.1", # Or your local server IP (e.g., 192.168.1.17)
+    host="127.0.0.1", # Or your local server IP
     database="tvtracker",
     user="your_username",
     password="your_secure_password"
