@@ -1,0 +1,23 @@
+name: tvtracker-database
+services:
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      # Replace with your desired credentials
+      POSTGRES_USER: your_username
+      POSTGRES_PASSWORD: your_secure_password
+      POSTGRES_DB: tvtracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - /DATA/AppData/tvtracker-db/data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      # Expose Adminer on port 8085
+      - "8085:8080"
+    depends_on:
+      - postgres
