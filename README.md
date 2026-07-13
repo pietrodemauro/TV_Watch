@@ -61,7 +61,8 @@ To keep the API running permanently in the background, create a systemd service:
 `sudo nano /etc/systemd/system/tvtracker-api.service`
 
 Insert the following (replace YOUR_USERNAME):
-``Ini, TOML
+```
+Ini, TOML
 
 [Unit]
 Description=TV Tracker FastAPI Backend
@@ -75,7 +76,8 @@ Restart=always
 RestartSec=3
 
 [Install]
-WantedBy=multi-user.target``
+WantedBy=multi-user.target
+```
 
 Enable and start the service:
 
@@ -96,4 +98,4 @@ Bash
 
 📝 License
 
-This project is open-source and available under the GNU public license v3.0.
+This project is open-source and available under the GPL-3.0 license.
