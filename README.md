@@ -96,6 +96,18 @@ Bash
 
 `0 3 * * * /home/YOUR_USERNAME/tvtracker_backend/venv/bin/python /home/YOUR_USERNAME/tvtracker_backend/sync_episodes.py >> /home/YOUR_USERNAME/tvtracker_backend/sync_cron.log 2>&1`
 
+### 🔄 Optional: Migrate from TV Time
+If you are moving away from the TV Time app, you can easily import all your watch history (movies and TV shows) into your new local database.
+
+To get your data:
+1. Install the **"TV TIME OUT BY REFRACT"** extension in your web browser.
+2. Log in to your account on the official TV Time website.
+3. Use the extension to generate and download the JSON export of your profile.
+4. Place the downloaded files in the same folder as this project and rename them to `tvtime-movies.json` and `tvtime-series.json`.
+
+Once the files are in place, simply run the provided migration script:
+`python import_tvtime.py`
+
 📝 License
 
 This project is open-source and available under the GPL-3.0 license.
