@@ -1,24 +1,25 @@
 import json
 import psycopg2
 
-# 1. Connessione al Database (usiamo localhost o l'IP locale perché siamo sul server)
-# Assicurati che password e utente siano quelli corretti
+# 1. Database Connection (using localhost or local IP since it runs on the server)
+# Ensure password and username are correct
 conn = psycopg2.connect(
-    host="127.0.0.1", # Oppure 192.168.1.17
+    host="127.0.0.1", # Or your local server IP (e.g., 192.168.1.17)
     database="tvtracker",
-    user="Pietro",
-    password="Ugo_Ugazzi3"
+    user="your_username",
+    password="your_secure_password"
 )
 cursor = conn.cursor()
 
-print("Connesso al database. Inizio l'importazione...")
+print("Connected to the database. Starting data import...")
 
-# 2. IMPORTAZIONE FILM
+# 2. IMPORT MOVIES
 try:
-    with open('tvtime-movies-2026-07-04.json', 'r') as f:
+    # Rename your TV Time export file to match this, or change the name below
+    with open('tvtime-movies.json', 'r') as f:
         movies = json.load(f)
         for m in movies:
-            # Estrazione sicura dei dati (in caso manchino dei campi nel JSON)
+            # Safe data extraction (in case some fields are missing from the JSON)
             ids = m.get("id", {})
             imdb_id = ids.get("imdb")
             tvdb_id = ids.get("tvdb")
@@ -27,19 +28,20 @@ try:
             is_watched = m.get("is_watched", False)
             watched_at = m.get("watched_at")
 
-            # ON CONFLICT DO NOTHING evita che lo script si blocchi se importi due volte lo stesso film
+            # ON CONFLICT DO NOTHING prevents script failure if the same movie is imported twice
             cursor.execute("""
                 INSERT INTO Film (imdb_id, tvdb_id, titolo, anno, is_watched, watched_at)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT (imdb_id) DO NOTHING;
             """, (imdb_id, tvdb_id, title, year, is_watched, watched_at))
-    print(f"Importati {len(movies)} Film.")
+    print(f"Successfully imported {len(movies)} movies.")
 except FileNotFoundError:
-    print("File dei film non trovato, salto il passaggio.")
+    print("Movies JSON file not found, skipping this step.")
 
-# 3. IMPORTAZIONE SERIE E EPISODI
+# 3. IMPORT TV SHOWS AND EPISODES
 try:
-    with open('tvtime-series-2026-07-04.json', 'r') as f:
+    # Rename your TV Time export file to match this, or change the name below
+    with open('tvtime-series.json', 'r') as f:
         series = json.load(f)
         for s in series:
             ids = s.get("id", {})
@@ -48,7 +50,7 @@ try:
             title = s.get("title")
             status = s.get("status")
 
-            # Inserisce la serie e recupera l'ID generato da Postgres (necessario per gli episodi)
+            # Insert the series and retrieve the auto-generated Postgres ID (needed for the episodes)
             cursor.execute("""
                 INSERT INTO Serie (imdb_id, tvdb_id, titolo, stato)
                 VALUES (%s, %s, %s, %s)
@@ -58,13 +60,13 @@ try:
             
             res = cursor.fetchone()
             if res:
-                serie_id = res[0] # Nuova serie appena inserita
+                serie_id = res[0] # Newly inserted series
             else:
-                # La serie esisteva già (ON CONFLICT), andiamo a pescare il suo ID per collegare gli episodi
+                # The series already existed (ON CONFLICT), let's fetch its ID to link the episodes
                 cursor.execute("SELECT id FROM Serie WHERE tvdb_id = %s", (tvdb_id,))
                 serie_id = cursor.fetchone()[0]
 
-            # Estrai tutti gli episodi dalle varie stagioni
+            # Extract all episodes from the seasons
             for season in s.get("seasons", []):
                 s_num = season.get("number")
                 for ep in season.get("episodes", []):
@@ -81,12 +83,12 @@ try:
                         ON CONFLICT (tvdb_id) DO NOTHING;
                     """, (serie_id, ep_tvdb, s_num, ep_num, ep_name, ep_watched, ep_watched_at))
                     
-    print(f"Importate {len(series)} Serie TV con i rispettivi episodi.")
+    print(f"Successfully imported {len(series)} TV Shows and their episodes.")
 except FileNotFoundError:
-    print("File delle serie TV non trovato, salto il passaggio.")
+    print("TV Shows JSON file not found, skipping this step.")
 
-# 4. SALVATAGGIO FINALE E CHIUSURA
+# 4. FINAL COMMIT AND CLOSING CONNECTION
 conn.commit()
 cursor.close()
 conn.close()
-print("Dati scritti fisicamente nel database! Operazione conclusa.")
+print("Data successfully committed to the database! Operation complete.")
