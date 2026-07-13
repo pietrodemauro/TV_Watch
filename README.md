@@ -108,6 +108,6 @@ To get your data:
 Once the files are in place, simply run the provided migration script:
 `python import_tvtime.py`
 
-📝 License
+### 📝 License
 
 This project is open-source and available under the GPL-3.0 license.
