@@ -112,7 +112,7 @@ Once the files are in place, simply run the provided migration script:
 
 This project is open-source and available under the GPL-3.0 license.
 
-### DIscalimer
+### Discalimer
 AI tools have been used to write and/or review these codes, exercise caution when executing the code.
 
 
