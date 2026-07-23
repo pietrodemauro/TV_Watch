@@ -109,7 +109,7 @@
             const watchlist = document.getElementById('moviesWatchlist');
             const watched = document.getElementById('moviesWatched');
             
-            // 1. Usiamo i buffer in memoria invece di toccare il DOM!
+            // 1. We use memory buffers
             let watchlistBuffer = ''; 
             let watchedBuffer = '';
 
@@ -139,12 +139,12 @@
                         </div>
                     </div>`;
                 
-                // 2. Aggiungiamo alla stringa in memoria (velocissimo)
+                // 2. Append to the memory string
                 if (m.is_watched) watchedBuffer += card;
                 else watchlistBuffer += card;
             });
 
-            // 3. Modifichiamo il DOM una volta sola alla fine! (0 scatti)
+            // 3. Update the DOM only once
             watchlist.innerHTML = watchlistBuffer; 
             watched.innerHTML = watchedBuffer;
         }
@@ -169,14 +169,13 @@
         async function deleteMovie(id) { if(confirm("Eliminare definitivamente?")) { await fetch(`${API}/movies/${id}`, { method: 'DELETE' }); loadMovies(); } }
         async function rateMovie(id, voto) { await fetch(`${API}/movies/${id}/rate`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({voto: parseInt(voto)}) }); loadMovies(); }
 
-        // --- SERIE TV ---
-	// --- SERIE TV ---
+	// --- TV SERIES ---
         async function loadSeries() {
             const res = await fetch(`${API}/series`);
             globalSeries = await res.json();
             const grid = document.getElementById('seriesGrid');
             
-            let gridBuffer = ''; // Buffer in memoria
+            let gridBuffer = ''; // Memory buffer
 
             globalSeries.forEach(s => {
                 gridBuffer += `
@@ -192,7 +191,7 @@
                     </div>`;
             });
 
-            // Stampa a schermo in un colpo solo
+            // Render to screen all at once
             grid.innerHTML = gridBuffer;
         }
 
@@ -214,7 +213,7 @@
 
         async function deleteSeries(id) { if(confirm("Eliminare intera serie e tutti gli episodi?")) { await fetch(`${API}/series/${id}`, { method: 'DELETE' }); loadSeries(); } }
 
-	// --- EPISODI MODALE ---
+	// --- EPISODES MODAL ---
         async function openEpisodes(serieId) {
             const serie = globalSeries.find(x => x.id === serieId);
             document.getElementById('episodesModalTitle').innerText = serie ? serie.titolo : 'Episodes';
@@ -226,7 +225,7 @@
             const res = await fetch(`${API}/series/${serieId}/episodes`);
             const episodes = await res.json();
             
-            let listBuffer = ''; // Buffer in memoria per gli episodi
+            let listBuffer = ''; // Memory buffer for the episodes
 
             episodes.forEach(ep => {
                 const btn = !ep.is_watched 
@@ -254,7 +253,7 @@
                     </li>`;
             });
 
-            // Sostituisce il "Loading episodes..." con la lista intera in un colpo solo
+            // Replaces the "Loading episodes..." text with the entire list at once
             list.innerHTML = listBuffer;
         }	
 
