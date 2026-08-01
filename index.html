@@ -21,25 +21,22 @@
                 </div>
                 <div class="flex space-x-4">
                     <button onclick="switchView('movies')" class="text-gray-300 hover:text-white px-3 py-2 rounded-md font-medium">🎬 Movies</button>
-                    <button onclick="switchView('series')" class="text-gray-300 hover:text-white px-3 py-2 rounded-md font-medium">📺 TV Shows</button>
+                    <button onclick="switchView('series')" class="text-gray-300 hover:text-white px-3 py-2 rounded-md font-medium">📺 Shows</button>
+                    <button onclick="switchView('collections')" class="text-purple-400 hover:text-purple-300 px-3 py-2 rounded-md font-medium">📂 Collections</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- MAIN CONTENT -->
     <main class="max-w-7xl mx-auto p-6">
         
         <!-- HOME -->
         <div id="view-home" class="view-section text-center py-20">
             <h1 class="text-5xl font-extrabold mb-6">Welcome Back!</h1>
             <div class="flex justify-center space-x-6 mt-12">
-                <div onclick="switchView('movies')" class="cursor-pointer bg-gray-800 hover:bg-gray-700 p-10 rounded-xl shadow-lg border border-gray-700 transform hover:scale-105 transition">
-                    <div class="text-6xl mb-4">🍿</div><h2 class="text-2xl font-bold">Movies</h2>
-                </div>
-                <div onclick="switchView('series')" class="cursor-pointer bg-gray-800 hover:bg-gray-700 p-10 rounded-xl shadow-lg border border-gray-700 transform hover:scale-105 transition">
-                    <div class="text-6xl mb-4">🛋️</div><h2 class="text-2xl font-bold">TV Shows</h2>
-                </div>
+                <div onclick="switchView('movies')" class="cursor-pointer bg-gray-800 hover:bg-gray-700 p-10 rounded-xl shadow border border-gray-700 transform hover:scale-105 transition"><div class="text-6xl mb-4">🍿</div><h2 class="text-2xl font-bold">Movies</h2></div>
+                <div onclick="switchView('series')" class="cursor-pointer bg-gray-800 hover:bg-gray-700 p-10 rounded-xl shadow border border-gray-700 transform hover:scale-105 transition"><div class="text-6xl mb-4">🛋️</div><h2 class="text-2xl font-bold">TV Shows</h2></div>
+                <div onclick="switchView('collections')" class="cursor-pointer bg-gray-800 hover:bg-gray-700 p-10 rounded-xl shadow border border-gray-700 transform hover:scale-105 transition"><div class="text-6xl mb-4">📂</div><h2 class="text-2xl font-bold">Collections</h2></div>
             </div>
         </div>
 
@@ -56,89 +53,144 @@
         </div>
 
         <!-- TV SERIES -->
-        <div id="view-series" class="view-section hidden relative">
+        <div id="view-series" class="view-section hidden">
             <div class="bg-gray-800 p-4 rounded-lg shadow mb-8 flex space-x-2">
                 <input type="text" id="seriesSearch" placeholder="Title or IMDB ID (tt...)" class="flex-1 bg-gray-700 p-3 rounded text-white outline-none">
                 <button onclick="addSeries()" id="btn-add-series" class="bg-blue-600 hover:bg-blue-500 px-6 rounded font-bold">Add Show</button>
             </div>
             <h2 class="text-3xl font-semibold mb-4 border-b border-gray-700 pb-2">My Shows</h2>
             <div id="seriesGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+        </div>
 
-            <!-- EPISODES MODAL -->
-            <div id="episodesModal" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex justify-center items-center p-4">
-                <div class="bg-gray-800 rounded-lg w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl border border-gray-700">
-                    <div class="p-4 border-b border-gray-700 flex justify-between items-center">
-                        <h2 id="episodesModalTitle" class="text-2xl font-bold text-yellow-500">Title</h2>
-                        <button onclick="closeModal()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+        <!-- COLLECTIONS -->
+        <div id="view-collections" class="view-section hidden">
+            <div class="bg-gray-800 p-4 rounded-lg shadow mb-8 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                <input type="text" id="newCollName" placeholder="New Collection Name (e.g. Marvel)" class="flex-1 bg-gray-700 p-3 rounded text-white outline-none">
+                <select id="newCollType" class="bg-gray-700 p-3 rounded text-white outline-none">
+                    <option value="movie">Movie Collection</option>
+                    <option value="series">TV Show Collection</option>
+                </select>
+                <button id="btn-create-coll" onclick="createCollection()" class="bg-purple-600 hover:bg-purple-500 px-6 py-3 rounded font-bold transition">Create</button>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Sidebar -->
+                <div class="w-full md:w-1/4 bg-gray-800 p-4 rounded-lg border border-gray-700 h-fit">
+                    <h3 class="font-bold text-xl mb-4 border-b border-gray-700 pb-2">My Collections</h3>
+                    <div id="collectionsSidebar" class="space-y-1"></div>
+                </div>
+                <!-- Main View -->
+                <div class="w-full md:w-3/4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 id="currentCollTitle" class="text-3xl font-semibold">Select a collection</h2>
+                        <div class="flex space-x-2">
+                            <button id="manageCollBtn" onclick="openManageModal()" class="hidden bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded text-sm font-bold shadow transition">✏️ Manage Items</button>
+                            <button id="deleteCollBtn" onclick="deleteCurrentCollection()" class="hidden bg-red-600 hover:bg-red-500 px-4 py-2 rounded text-sm font-bold shadow transition">🗑 Delete</button>
+                        </div>
                     </div>
-                    <div class="p-4 overflow-y-auto flex-1">
-                        <ul id="episodesList" class="space-y-2"></ul>
+                    <div id="collectionItemsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                        <p class="text-gray-400 col-span-full">Choose a collection from the sidebar to view items.</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- MODALS -->
+        <!-- Episodes Modal -->
+        <div id="episodesModal" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex justify-center items-center p-4">
+            <div class="bg-gray-800 rounded-lg w-full max-w-3xl max-h-[85vh] flex flex-col border border-gray-700">
+                <div class="p-4 border-b border-gray-700 flex justify-between">
+                    <h2 id="episodesModalTitle" class="text-2xl font-bold text-yellow-500">Episodes</h2>
+                    <button onclick="closeModal('episodesModal')" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+                </div>
+                <div class="p-4 overflow-y-auto flex-1"><ul id="episodesList" class="space-y-2"></ul></div>
+            </div>
+        </div>
+
+        <!-- Manage Collection Items Modal -->
+        <div id="manageCollModal" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex justify-center items-center p-4">
+            <div class="bg-gray-800 rounded-lg w-full max-w-lg flex flex-col border border-gray-700 max-h-[85vh]">
+                <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Add/Remove Items</h2>
+                    <button onclick="closeModal('manageCollModal')" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+                </div>
+                <!-- Real-time search filter -->
+                <div class="p-4 bg-gray-900 border-b border-gray-700">
+                    <input type="text" id="manageSearch" onkeyup="filterManageList()" placeholder="Search titles..." class="w-full bg-gray-700 p-2 rounded text-white outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div class="p-4 overflow-y-auto flex-1" id="manageCollList"></div>
+                <div class="p-4 border-t border-gray-700 flex justify-end space-x-2">
+                    <button onclick="closeModal('manageCollModal')" class="px-4 py-2 bg-gray-600 rounded">Cancel</button>
+                    <button onclick="saveManageModal()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded font-bold">Save Changes</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
         const API = "/api";
         const PLACEHOLDER_IMG = "https://via.placeholder.com/300x450/374151/9CA3AF?text=No+Poster";
         let globalSeries = [];
+        let allCollections = [];
+        let currentCollectionId = null;
+        let currentCollectionType = null;
 
         function switchView(viewName) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             document.getElementById('view-' + viewName).classList.remove('hidden');
             if (viewName === 'movies') loadMovies();
             if (viewName === 'series') loadSeries();
+            if (viewName === 'collections') loadCollectionsSidebar();
         }
 
         function getPoster(url) { return (url && url !== "N/A") ? url : PLACEHOLDER_IMG; }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        function highlightCard(elementId) {
-            const el = document.getElementById(elementId);
-            if(el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                el.classList.add('ring-4', 'ring-yellow-500', 'transform', 'scale-105', 'z-10');
-                setTimeout(() => el.classList.remove('ring-4', 'ring-yellow-500', 'transform', 'scale-105', 'z-10'), 3000);
-            }
+        // --- HTML GENERATORS (DRY PRINCIPLE) ---
+        function generateMovieCard(m) {
+            const actionBtn = !m.is_watched 
+                ? `<button onclick="toggleMovie(${m.id})" class="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded mb-2 w-full">✔ Mark Watched</button>`
+                : `<button onclick="toggleMovie(${m.id})" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded mb-2 w-full">👀 To Watchlist</button>`;
+            let ratingOps = `<option value="0">Rate...</option>`;
+            for(let i=1; i<=10; i++) ratingOps += `<option value="${i}" ${m.voto === i ? 'selected' : ''}>⭐ ${i}/10</option>`;
+
+            return `
+                <div id="movie-card-${m.id}" class="bg-gray-800 rounded-lg overflow-hidden shadow-lg group relative border border-gray-700">
+                    <img src="${getPoster(m.locandina_url)}" class="w-full aspect-[2/3] object-cover">
+                    ${m.voto ? `<div class="absolute top-2 right-2 bg-yellow-500 text-black font-bold px-2 py-1 rounded-full text-xs shadow">⭐ ${m.voto}</div>` : ''}
+                    <div class="absolute inset-0 bg-black bg-opacity-90 flex flex-col justify-center opacity-0 group-hover:opacity-100 transition-opacity p-3 text-center">
+                        <span class="font-bold mb-1 text-sm">${m.titolo}</span>
+                        <span class="text-xs text-gray-400 mb-2">${m.anno || ''}</span>
+                        <select onchange="rateMovie(${m.id}, this.value)" class="bg-gray-700 text-white text-xs rounded px-2 py-1 mb-2 w-full text-center outline-none shadow">${ratingOps}</select>
+                        ${actionBtn}
+                        <button onclick="deleteMovie(${m.id})" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1 rounded w-full shadow">🗑 Delete</button>
+                    </div>
+                </div>`;
+        }
+
+        function generateSeriesCard(s) {
+            return `
+                <div id="series-card-${s.id}" class="bg-gray-800 rounded-lg overflow-hidden shadow-lg group relative border border-gray-700">
+                    <img src="${getPoster(s.locandina_url)}" class="w-full aspect-[2/3] object-cover cursor-pointer" onclick="openEpisodes(${s.id})">
+                    <div class="absolute top-0 left-0 right-0 p-2 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        <button onclick="deleteSeries(${s.id}); event.stopPropagation();" class="bg-red-600 hover:bg-red-500 text-white p-2 rounded-full shadow pointer-events-auto" title="Delete series">🗑</button>
+                    </div>
+                    <div class="p-3 bg-gray-800 text-center cursor-pointer" onclick="openEpisodes(${s.id})">
+                        <h3 class="font-bold text-sm truncate">${s.titolo}</h3>
+                        ${s.stato === 'Ended' ? '<span class="text-xs text-red-400">Ended</span>' : '<span class="text-xs text-green-400">Continuing</span>'}
+                    </div>
+                </div>`;
         }
 
         // --- MOVIES ---
         async function loadMovies() {
             const res = await fetch(`${API}/movies`);
             const movies = await res.json();
-            const watchlist = document.getElementById('moviesWatchlist');
-            const watched = document.getElementById('moviesWatched');
-            watchlist.innerHTML = ''; watched.innerHTML = '';
-
-            movies.forEach(m => {
-                const actionBtn = !m.is_watched 
-                    ? `<button onclick="toggleMovie(${m.id})" class="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded mb-2 w-full shadow">✔ Mark Watched</button>`
-                    : `<button onclick="toggleMovie(${m.id})" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded mb-2 w-full shadow">👀 To Watchlist</button>`;
-
-                let ratingOptions = `<option value="0">Rate...</option>`;
-                for(let i=1; i<=10; i++) {
-                    ratingOptions += `<option value="${i}" ${m.voto === i ? 'selected' : ''}>⭐ ${i}/10</option>`;
-                }
-
-                const card = `
-                    <div id="movie-card-${m.id}" class="bg-gray-800 rounded-lg overflow-hidden shadow-lg group relative border border-gray-700 transition-all duration-500">
-                        <img src="${getPoster(m.locandina_url)}" class="w-full aspect-[2/3] object-cover">
-                        ${m.voto ? `<div class="absolute top-2 right-2 bg-yellow-500 text-black font-bold px-2 py-1 rounded-full text-xs shadow">⭐ ${m.voto}</div>` : ''}
-                        
-                        <div class="absolute inset-0 bg-black bg-opacity-90 flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity p-3 text-center">
-                            <span class="font-bold mb-1 text-sm">${m.titolo}</span>
-                            <span class="text-xs text-gray-400 mb-3">${m.anno || ''}</span>
-                            <select onchange="rateMovie(${m.id}, this.value)" class="bg-gray-700 text-white text-xs rounded px-2 py-1 mb-3 w-full text-center outline-none cursor-pointer shadow">
-                                ${ratingOptions}
-                            </select>
-                            ${actionBtn}
-                            <button onclick="deleteMovie(${m.id})" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1 rounded w-full shadow">🗑 Delete</button>
-                        </div>
-                    </div>`;
-                
-                if (m.is_watched) watched.innerHTML += card;
-                else watchlist.innerHTML += card;
-            });
+            let wlBuffer = '', wBuffer = '';
+            movies.forEach(m => { if (m.is_watched) wBuffer += generateMovieCard(m); else wlBuffer += generateMovieCard(m); });
+            document.getElementById('moviesWatchlist').innerHTML = wlBuffer; 
+            document.getElementById('moviesWatched').innerHTML = wBuffer;
         }
 
         async function addMovie() {
@@ -147,106 +199,241 @@
             document.getElementById('btn-add-movie').innerText = "Searching...";
             try {
                 const res = await fetch(`${API}/movies/add`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({query}) });
-                const data = await res.json();
-                if(res.ok) { 
-                    document.getElementById('movieSearch').value = ''; 
-                    await loadMovies(); 
-                    if (data.status === "exists") highlightCard(`movie-card-${data.id}`);
-                } else alert("Movie not found on OMDB!");
-            } catch(e) { alert("Connection Error."); }
-            finally { document.getElementById('btn-add-movie').innerText = "Add Movie"; }
+                if(res.ok) { document.getElementById('movieSearch').value = ''; await loadMovies(); }
+            } finally { document.getElementById('btn-add-movie').innerText = "Add Movie"; }
         }
 
-        async function toggleMovie(id) { await fetch(`${API}/movies/${id}/toggle`, { method: 'PUT' }); loadMovies(); }
-        async function deleteMovie(id) { if(confirm("Permanently delete?")) { await fetch(`${API}/movies/${id}`, { method: 'DELETE' }); loadMovies(); } }
-        async function rateMovie(id, voto) { await fetch(`${API}/movies/${id}/rate`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({voto: parseInt(voto)}) }); loadMovies(); }
+	async function toggleMovie(id) { 
+            await fetch(`${API}/movies/${id}/toggle`, { method: 'PUT' }); 
+            
+            // 1. Aggiorna SEMPRE la griglia principale dei film
+            await loadMovies(); 
+            
+            // 2. Se una collezione è aperta/in memoria, aggiorna anche quella, 
+            // così i dati restano perfettamente sincronizzati ovunque.
+            if (currentCollectionId) {
+                viewCollection(currentCollectionId, document.getElementById('currentCollTitle').innerText, currentCollectionType);
+            }
+        }
+                
+	async function deleteMovie(id) { 
+            if(confirm("Permanently delete?")) { 
+                await fetch(`${API}/movies/${id}`, { method: 'DELETE' }); 
+                
+                await loadMovies(); 
+                if (currentCollectionId) {
+                    viewCollection(currentCollectionId, document.getElementById('currentCollTitle').innerText, currentCollectionType);
+                }
+            } 
+        }
+        
+	async function rateMovie(id, voto) { 
+            await fetch(`${API}/movies/${id}/rate`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({voto: parseInt(voto)}) }); 
+            
+            await loadMovies(); 
+            if (currentCollectionId) {
+                viewCollection(currentCollectionId, document.getElementById('currentCollTitle').innerText, currentCollectionType);
+            }
+        }
 
         // --- TV SERIES ---
         async function loadSeries() {
             const res = await fetch(`${API}/series`);
             globalSeries = await res.json();
-            const grid = document.getElementById('seriesGrid');
-            grid.innerHTML = '';
-
-            globalSeries.forEach(s => {
-                grid.innerHTML += `
-                    <div id="series-card-${s.id}" class="bg-gray-800 rounded-lg overflow-hidden shadow-lg group relative border border-gray-700 transition-all duration-500">
-                        <img src="${getPoster(s.locandina_url)}" class="w-full aspect-[2/3] object-cover cursor-pointer" onclick="openEpisodes(${s.id})">
-                        <div class="absolute top-0 left-0 right-0 p-2 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                            <button onclick="deleteSeries(${s.id}); event.stopPropagation();" class="bg-red-600 hover:bg-red-500 text-white p-2 rounded-full shadow pointer-events-auto" title="Delete series">🗑</button>
-                        </div>
-                        <div class="p-3 bg-gray-800 text-center cursor-pointer" onclick="openEpisodes(${s.id})">
-                            <h3 class="font-bold text-sm truncate">${s.titolo}</h3>
-                            ${s.stato === 'Ended' ? '<span class="text-xs text-red-400">Ended</span>' : '<span class="text-xs text-green-400">Continuing</span>'}
-                        </div>
-                    </div>`;
-            });
+            let gridBuffer = '';
+            globalSeries.forEach(s => gridBuffer += generateSeriesCard(s));
+            document.getElementById('seriesGrid').innerHTML = gridBuffer;
         }
-
+        
         async function addSeries() {
             const query = document.getElementById('seriesSearch').value;
             if(!query) return;
             document.getElementById('btn-add-series').innerText = "Fetching..."; 
             try {
                 const res = await fetch(`${API}/series/add`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({query}) });
-                const data = await res.json();
-                if(res.ok) { 
-                    document.getElementById('seriesSearch').value = ''; 
-                    await loadSeries(); 
-                    if (data.status === "exists") { highlightCard(`series-card-${data.id}`); openEpisodes(data.id); }
-                } else alert("Show not found on OMDB!");
-            } catch(e) { alert("Connection Error."); }
-            finally { document.getElementById('btn-add-series').innerText = "Add Show"; }
+                if(res.ok) { document.getElementById('seriesSearch').value = ''; await loadSeries(); }
+            } finally { document.getElementById('btn-add-series').innerText = "Add Show"; }
+        }
+        
+	async function deleteSeries(id) { 
+            if(confirm("Delete show?")) { 
+                await fetch(`${API}/series/${id}`, { method: 'DELETE' }); 
+                
+                
+                await loadSeries(); 
+                
+                
+                if (currentCollectionId) {
+                    viewCollection(currentCollectionId, document.getElementById('currentCollTitle').innerText, currentCollectionType);
+                }
+            } 
         }
 
-        async function deleteSeries(id) { if(confirm("This deletes the show and all watched progress. Confirm?")) { await fetch(`${API}/series/${id}`, { method: 'DELETE' }); loadSeries(); } }
-
+        // --- EPISODES ---
         async function openEpisodes(serieId) {
+            // Global search fallback for collections
+            if (globalSeries.length === 0) await loadSeries(); 
             const serie = globalSeries.find(x => x.id === serieId);
             document.getElementById('episodesModalTitle').innerText = serie ? serie.titolo : 'Episodes';
             document.getElementById('episodesModal').classList.remove('hidden');
-            
-            const list = document.getElementById('episodesList');
-            list.innerHTML = '<p class="text-center text-gray-400">Loading episodes...</p>';
-
             const res = await fetch(`${API}/series/${serieId}/episodes`);
             const episodes = await res.json();
-            list.innerHTML = '';
-
+            let listBuffer = '';
             episodes.forEach(ep => {
-                const btn = !ep.is_watched 
-                    ? `<button onclick="toggleEpisode(${ep.id}, ${serieId})" class="bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-xs font-bold shadow shrink-0">✔ Watched</button>` 
-                    : `<button onclick="toggleEpisode(${ep.id}, ${serieId})" class="bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded text-xs font-bold shadow shrink-0">↺ Undo</button>`;
-
-                let epRatingOptions = `<option value="0">-</option>`;
-                for(let i=1; i<=10; i++) {
-                    epRatingOptions += `<option value="${i}" ${ep.voto === i ? 'selected' : ''}>${i}</option>`;
-                }
-
-                list.innerHTML += `
+                const btn = !ep.is_watched ? `<button onclick="toggleEpisode(${ep.id}, ${serieId})" class="bg-green-600 px-3 py-1 rounded text-xs shadow">✔ Watched</button>` : `<button onclick="toggleEpisode(${ep.id}, ${serieId})" class="bg-gray-600 px-3 py-1 rounded text-xs shadow">↺ Undo</button>`;
+                let ops = `<option value="0">-</option>`;
+                for(let i=1; i<=10; i++) ops += `<option value="${i}" ${ep.voto === i ? 'selected' : ''}>${i}</option>`;
+                listBuffer += `
                     <li class="flex justify-between items-center bg-gray-700 p-2 md:p-3 rounded ${ep.is_watched ? 'opacity-50' : ''} gap-2">
-                        <div class="flex-1 min-w-0">
-                            <span class="font-bold text-yellow-500 mr-2">S${String(ep.stagione).padStart(2,'0')}xE${String(ep.numero_episodio).padStart(2,'0')}</span> 
-                            <span class="${ep.is_watched ? 'line-through text-gray-400' : 'text-gray-100'} break-words">${ep.titolo_episodio}</span>
-                        </div>
+                        <div class="flex-1 min-w-0"><span class="font-bold text-yellow-500 mr-2">S${String(ep.stagione).padStart(2,'0')}xE${String(ep.numero_episodio).padStart(2,'0')}</span> <span class="break-words">${ep.titolo_episodio}</span></div>
                         <div class="flex items-center space-x-2 shrink-0">
-                            ${ep.voto ? `<span class="text-yellow-500 text-xs font-bold hidden md:inline">⭐ ${ep.voto}</span>` : ''}
-                            <select onchange="rateEpisode(${ep.id}, this.value, ${serieId})" class="bg-gray-800 text-gray-300 text-xs rounded p-1 border border-gray-600 outline-none cursor-pointer">
-                                ${epRatingOptions}
-                            </select>
+                            ${ep.voto ? `<span class="text-yellow-500 text-xs hidden md:inline">⭐ ${ep.voto}</span>` : ''}
+                            <select onchange="rateEpisode(${ep.id}, this.value, ${serieId})" class="bg-gray-800 text-gray-300 text-xs p-1 border border-gray-600 rounded">${ops}</select>
                             ${btn}
                         </div>
                     </li>`;
             });
+            document.getElementById('episodesList').innerHTML = listBuffer;
         }
-
+        
         async function toggleEpisode(epId, serieId) { await fetch(`${API}/episodes/${epId}/toggle`, { method: 'PUT' }); openEpisodes(serieId); }
         async function rateEpisode(epId, voto, serieId) { await fetch(`${API}/episodes/${epId}/rate`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({voto: parseInt(voto)}) }); openEpisodes(serieId); }
 
-        function closeModal() { document.getElementById('episodesModal').classList.add('hidden'); }
+        // --- COLLECTIONS LOGIC ---
+        async function loadCollectionsSidebar() {
+            const res = await fetch(`${API}/collections`);
+            allCollections = await res.json();
+            let html = '';
+            allCollections.forEach(c => {
+                const icon = c.tipo === 'movie' ? '🍿' : '📺';
+                const activeClass = c.id === currentCollectionId ? 'bg-gray-700 border-l-4 border-purple-500' : 'hover:bg-gray-700';
+                html += `<div onclick="viewCollection(${c.id}, '${c.nome.replace("'", "\\'")}', '${c.tipo}')" class="cursor-pointer p-3 rounded flex items-center gap-3 transition ${activeClass}">
+                            <span class="text-xl">${icon}</span> <span class="font-bold">${c.nome}</span>
+                         </div>`;
+            });
+            document.getElementById('collectionsSidebar').innerHTML = html || '<p class="text-sm text-gray-400">No collections yet.</p>';
+        }
+
+        async function createCollection() {
+            const nome = document.getElementById('newCollName').value;
+            const tipo = document.getElementById('newCollType').value;
+            if (!nome) return;
+            const btn = document.getElementById('btn-create-coll');
+            btn.innerText = "Creating...";
+            
+            // Await added to fix race condition
+            await fetch(`${API}/collections`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({nome, tipo}) });
+            
+            document.getElementById('newCollName').value = '';
+            btn.innerText = "Create";
+            await loadCollectionsSidebar();
+        }
+
+        async function viewCollection(id, nome, tipo) {
+            currentCollectionId = id;
+            currentCollectionType = tipo;
+            document.getElementById('currentCollTitle').innerText = nome;
+            document.getElementById('manageCollBtn').classList.remove('hidden');
+            document.getElementById('deleteCollBtn').classList.remove('hidden');
+            
+            // Re-render sidebar to highlight active collection
+            loadCollectionsSidebar();
+            
+            const res = await fetch(`${API}/collections/${id}/items`);
+            const data = await res.json();
+            
+            let wlBuffer = '', wBuffer = '';
+            
+            if (data.tipo === 'movie') {
+                // Split movies into To Watch and Watched just like the home page!
+                data.items.forEach(m => {
+                    if (m.is_watched) wBuffer += generateMovieCard(m);
+                    else wlBuffer += generateMovieCard(m);
+                });
+                
+                document.getElementById('collectionItemsGrid').innerHTML = 
+                    `<div class="col-span-full"><h3 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">To Watch</h3></div>` +
+                    (wlBuffer || '<p class="text-gray-400 col-span-full mb-8">All caught up!</p>') +
+                    `<div class="col-span-full mt-4"><h3 class="text-xl font-bold mb-4 text-gray-400 border-b border-gray-700 pb-2">Watched</h3></div>` +
+                    (wBuffer || '<p class="text-gray-400 col-span-full">Nothing watched yet.</p>');
+            } else {
+                data.items.forEach(s => wlBuffer += generateSeriesCard(s));
+                document.getElementById('collectionItemsGrid').innerHTML = wlBuffer || '<p class="text-gray-400 col-span-full">This collection is empty.</p>';
+            }
+        }
+
+        async function deleteCurrentCollection() {
+            if(!confirm("Delete this collection? (Movies and Shows inside won't be deleted)")) return;
+            await fetch(`${API}/collections/${currentCollectionId}`, { method: 'DELETE' });
+            currentCollectionId = null;
+            currentCollectionType = null;
+            document.getElementById('currentCollTitle').innerText = "Select a collection";
+            document.getElementById('manageCollBtn').classList.add('hidden');
+            document.getElementById('deleteCollBtn').classList.add('hidden');
+            document.getElementById('collectionItemsGrid').innerHTML = '<p class="text-gray-400 col-span-full">Choose a collection from the sidebar to view items.</p>';
+            loadCollectionsSidebar();
+        }
+
+        // --- MANAGE COLLECTION ITEMS MODAL ---
+        async function openManageModal() {
+            if(!currentCollectionId || !currentCollectionType) return;
+            document.getElementById('manageCollList').innerHTML = '<p class="text-center text-gray-400">Loading library...</p>';
+            document.getElementById('manageSearch').value = '';
+            document.getElementById('manageCollModal').classList.remove('hidden');
+
+            // 1. Fetch ALL items of this type from the global library
+            const endpoint = currentCollectionType === 'movie' ? 'movies' : 'series';
+            const resAll = await fetch(`${API}/${endpoint}`);
+            const allItems = await resAll.json();
+
+            // 2. Fetch CURRENT items already in the collection to check their boxes
+            const resCurr = await fetch(`${API}/collections/${currentCollectionId}/items`);
+            const currData = await resCurr.json();
+            const currIds = currData.items.map(i => i.id);
+
+            // 3. Render the list
+            let html = '';
+            allItems.forEach(item => {
+                const checked = currIds.includes(item.id) ? 'checked' : '';
+                const year = item.anno ? `(${item.anno})` : '';
+                html += `<label class="manage-item flex items-center space-x-3 mb-2 p-3 hover:bg-gray-700 rounded cursor-pointer transition border border-transparent hover:border-gray-600">
+                            <input type="checkbox" value="${item.id}" class="manage-checkbox form-checkbox h-5 w-5 text-purple-600 rounded focus:ring-purple-500" ${checked}>
+                            <span class="text-white font-medium item-title">${item.titolo} <span class="text-gray-400 text-sm">${year}</span></span>
+                         </label>`;
+            });
+            
+            document.getElementById('manageCollList').innerHTML = html || '<p class="text-gray-400 text-center">No items available in your library.</p>';
+        }
+
+        function filterManageList() {
+            const query = document.getElementById('manageSearch').value.toLowerCase();
+            document.querySelectorAll('.manage-item').forEach(el => {
+                const title = el.querySelector('.item-title').innerText.toLowerCase();
+                el.style.display = title.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        async function saveManageModal() {
+            const checkboxes = document.querySelectorAll('.manage-checkbox');
+            const selectedIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => parseInt(cb.value));
+            
+            // Call our new API endpoint
+            await fetch(`${API}/collections/${currentCollectionId}/sync_items`, {
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ item_ids: selectedIds })
+            });
+            
+            closeModal('manageCollModal');
+            
+            // Instantly refresh the grid to show the new items
+            const currentColl = allCollections.find(c => c.id === currentCollectionId);
+            viewCollection(currentCollectionId, currentColl.nome, currentColl.tipo);
+        }
 
         loadMovies();
         loadSeries();
+        loadCollectionsSidebar();
     </script>
 </body>
 </html>
