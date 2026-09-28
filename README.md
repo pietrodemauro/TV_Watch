@@ -4,7 +4,7 @@ A self-hosted, lightweight, and blazing fast web application to track the movies
 
 It seamlessly integrates with the **OMDB API** to automatically fetch metadata, posters, and new episodes for continuing series in the background.
 
-## 🚀 Features
+## Features
 
 * **Movies & Watchlist:** Add movies by Title or IMDB ID. Move them seamlessly between your Watchlist and Watched list.
 * **Smart TV Shows Tracking:** Add a TV Show and the backend will automatically map all its seasons and episodes. 
@@ -20,7 +20,7 @@ It seamlessly integrates with the **OMDB API** to automatically fetch metadata, 
 * **Frontend:** HTML5, Vanilla JavaScript, TailwindCSS (CDN)
 * **API:** OMDB API
 
-## 📦 Installation Guide (Ubuntu / CasaOS)
+## Installation Guide (Ubuntu / CasaOS)
 
 ### 1. Prerequisites
 You need an API key from OMDB. You can get a free one (1000 requests/day) at [omdbapi.com](http://www.omdbapi.com).
@@ -111,8 +111,4 @@ Once the files are in place, simply run the provided migration script:
 ### 📝 License
 
 This project is open-source and available under the GPL-3.0 license.
-
-### Discalimer
-AI tools have been used to write and/or review these codes, exercise caution when executing the code.
-
 
