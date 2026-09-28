@@ -13,7 +13,7 @@ It seamlessly integrates with the **OMDB API** to automatically fetch metadata, 
 * **Single Page Application:** Fluid UX. The interface auto-scrolls to items if you try to add an existing movie or show.
 * **Docker Ready:** Designed to be easily spun up on environments like CasaOS or standard Ubuntu servers.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 * **Backend:** Python 3, FastAPI, Psycopg2, Uvicorn
 * **Database:** PostgreSQL (Containerized) + Adminer
