@@ -1,4 +1,4 @@
-# 📺 TV Tracker Pro
+# TV Tracker
 
 A self-hosted, lightweight, and blazing fast web application to track the movies and TV shows you watch. Built with **FastAPI**, **PostgreSQL**, and a modern **Vanilla JS + TailwindCSS** frontend.
 
@@ -96,7 +96,7 @@ Bash
 
 `0 3 * * * /home/YOUR_USERNAME/tvtracker_backend/venv/bin/python /home/YOUR_USERNAME/tvtracker_backend/sync_episodes.py >> /home/YOUR_USERNAME/tvtracker_backend/sync_cron.log 2>&1`
 
-### 🔄 Optional: Migrate from TV Time
+### Optional: Migrate from TV Time
 If you are moving away from the TV Time app, you can easily import all your watch history (movies and TV shows) into your new local database.
 
 To get your data:
@@ -108,7 +108,7 @@ To get your data:
 Once the files are in place, simply run the provided migration script:
 `python import_tvtime.py`
 
-### 📝 License
+### License
 
 This project is open-source and available under the GPL-3.0 license.
 
